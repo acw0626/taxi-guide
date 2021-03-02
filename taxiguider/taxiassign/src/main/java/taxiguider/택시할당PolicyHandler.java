@@ -51,7 +51,7 @@ public class 택시할당PolicyHandler{
             	//할당확인됨.setEventType("할당확인됨");
             	택시할당요청됨.publish();
             	
-            	할당확인됨 할당확인됨 = Assigner.get택시할당됨();
+            	할당확인됨 할당확인됨 = get택시할당됨();
             	할당확인됨.setId(택시할당요청됨.getId());
             	할당확인됨.set할당상태("할당확정");
                 할당확인됨.set고객휴대폰번호(택시할당요청됨.get고객휴대폰번호());

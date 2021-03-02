@@ -222,6 +222,51 @@ SET PATH=%MARIA_HOME%\BIN;%MONGO_HOME%\BIN;%KAFKA_HOME%\BIN\WINDOWS;%JAVA_HOME%\
 
 ![폴리그랏프로그래밍](https://user-images.githubusercontent.com/78134019/109489189-dbd33800-7ac9-11eb-86f5-bbdb072454ce.jpg)
 
+## 마이크로 서비스 호출 흐름
+
+# taxicall 서비스 호출처리
+호출(taxicall)->택시관리(taximanage) 간의 호출처리 됨.
+택시 할당에서 택시기사를 할당하여 호출 확정 상태가 됨.
+두 개의 호출 상태
+를 만듬.
+```
+http localhost:8081/택시호출s 휴대폰번호="01012345678" 호출상태=호출 호출위치="마포" 예상요금=25000
+http localhost:8081/택시호출s 휴대폰번호="01056789012" 호출상태=호출 호출위치="서대문구" 예상요금=30000
+```
+
+![image](screenshots/taxicall1.png "taxicall 서비스 호출")
+![image](screenshots/taxicall2.png "taxicall 서비스 호출")
+
+호출 결과는 모두 택시 할당에서 택시기사의 할당처리에 의해서 호출 확정 상태가 되어 있음.
+
+![image](screenshots/taxicall_result1.png "taxicall 서비스 호출 결과")
+![image](screenshots/taxicall_result2.png "taxicall 서비스 호출 결과")
+![image](screenshots/taximanage_result2.png "taxicall 서비스 호출 결과")
+
+
+# taxicall 서비스 호출 취소 처리
+
+호출 취소는 택시호출에서 다음과 같이 호출 하나를 취소 함으로써 진행 함.
+
+```
+http delete http://localhost:8081/택시호출s/1
+HTTP/1.1 204
+Date: Tue, 02 Mar 2021 16:59:12 GMT
+```
+호출이 취소 되면 택시 호출이 하나가 삭제 되었고, 
+
+```
+http localhost:8081/택시호출s/
+```
+![image](screenshots/taxicancel_result.png "taxicall 서비스 호출취소 결과")
+
+
+택시관리에서는 해당 호출에 대해서 호출취소로 상태가 변경 됨.
+
+```
+http localhost:8082/택시관리s/
+```
+![image](screenshots/taximanage_result.png "taxicall 서비스 호출취소 결과")
 
 ## Gateway 적용
 
