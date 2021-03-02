@@ -224,7 +224,7 @@ SET PATH=%MARIA_HOME%\BIN;%MONGO_HOME%\BIN;%KAFKA_HOME%\BIN\WINDOWS;%JAVA_HOME%\
 
 ## 마이크로 서비스 호출 흐름
 
-# taxicall 서비스 호출처리
+- taxicall 서비스 호출처리
 호출(taxicall)->택시관리(taximanage) 간의 호출처리 됨.
 택시 할당에서 택시기사를 할당하여 호출 확정 상태가 됨.
 두 개의 호출 상태
@@ -237,14 +237,14 @@ http localhost:8081/택시호출s 휴대폰번호="01056789012" 호출상태=호
 ![image](screenshots/taxicall1.png "taxicall 서비스 호출")
 ![image](screenshots/taxicall2.png "taxicall 서비스 호출")
 
-호출 결과는 모두 택시 할당에서 택시기사의 할당처리에 의해서 호출 확정 상태가 되어 있음.
+호출 결과는 모두 택시 할당(taxiassign)에서 택시기사의 할당으로 처리되어 호출 확정 상태가 되어 있음.
 
 ![image](screenshots/taxicall_result1.png "taxicall 서비스 호출 결과")
 ![image](screenshots/taxicall_result2.png "taxicall 서비스 호출 결과")
-![image](screenshots/taximanage_result2.png "taxicall 서비스 호출 결과")
+![image](screenshots/taximanage_result1.png "taxicall 서비스 호출 결과 - 택시관리")
 
 
-# taxicall 서비스 호출 취소 처리
+- taxicall 서비스 호출 취소 처리
 
 호출 취소는 택시호출에서 다음과 같이 호출 하나를 취소 함으로써 진행 함.
 
@@ -267,6 +267,14 @@ http localhost:8081/택시호출s/
 http localhost:8082/택시관리s/
 ```
 ![image](screenshots/taximanage_result.png "taxicall 서비스 호출취소 결과")
+
+- 고객 메시지 서비스 처리
+고객(customer)는 호출 확정과 할당 확정에 대한 메시지를 다음과 같이 받을 수 있으며,
+할당 된 택시기사의 정보를 또한 확인 할 수 있다.
+파이썬으로 구현 하였음.
+
+![image](screenshots/customer.png "호출 결과에 대한 고객 메시지")
+
 
 ## Gateway 적용
 
