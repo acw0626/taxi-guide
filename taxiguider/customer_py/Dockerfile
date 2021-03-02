@@ -1,4 +1,9 @@
-FROM openjdk:8u212-jdk-alpine
-COPY target/*SNAPSHOT.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java","-Xmx400M","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar","--spring.profiles.active=docker"]
+FROM python:2.7-slim
+WORKDIR /app
+ADD . /app
+RUN pip install --trusted-host pypi.python.org -r requirements.txt
+ENV NAME World
+EXPOSE 8090
+CMD ["python", "policy-handler.py"]
+
+
