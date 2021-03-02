@@ -1,0 +1,12 @@
+taxiguider\TaximanageApplication.class
+taxiguider\AbstractEvent$1.class
+taxiguider\TaximanageAssigned.class
+taxiguider\TaximanageCancelled.class
+taxiguider\TaximanageRepository.class
+taxiguider\AbstractEvent.class
+taxiguider\TaxicallCancelled.class
+taxiguider\TaximanageController.class
+taxiguider\TaxiassignCompleted.class
+taxiguider\Taximanage.class
+taxiguider\config\kafka\KafkaProcessor.class
+taxiguider\TaximanagePolicyHandler.class
