@@ -15,9 +15,9 @@ spec:
         app: customer
     spec:
       containers:
-        - name: command-handler
-          image: username/customer-command-handler:latest
-          ports:
-            - containerPort: 8083
+#        - name: command-handler
+#          image: skccteam03.azurecr.io/customer-command-handler:v1
+#          ports:
+#            - containerPort: 8083
         - name: policy-handler
-          image: username/customer-policy-handler:latest
+          image: skccteam03.azurecr.io/customer-policy-handler:v1
