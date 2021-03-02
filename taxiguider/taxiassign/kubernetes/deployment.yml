@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: taxiassign
-          image: username/taxiassign:latest
+          image: skccteam03.azurecr.io/taxiassign:v1
           ports:
             - containerPort: 8080
           readinessProbe:

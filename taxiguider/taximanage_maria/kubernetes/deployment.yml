@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: store
-          image: username/store:latest
+          image: skccteam03.azurecr.io/taximanage:v1
           ports:
             - containerPort: 8080
           readinessProbe:
