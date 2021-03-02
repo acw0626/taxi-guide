@@ -146,8 +146,7 @@ Eventual Consistency 를 기본으로 채택함.
 
 ## 헥사고날 아키텍처 다이어그램 도출 (Polyglot)
 
-![핵사고날수정됨](https://user-images.githubusercontent.com/78134019/109488099-7468b880-7ac8-11eb-93ec-b68003e5ccf4.jpg)
-
+![핵사고날수정됨](screenshots/hexagonal_archi.png "헥사고날아키텍처")
 
 
 
@@ -277,6 +276,13 @@ http localhost:8082/택시관리s/
 
 
 ## Gateway 적용
+
+서비스에 대한 하나의 접점을 만들기 위한 게이트웨이의 설정은 8088로 설정 하였으며, 다음 마이크로서비스에 대한 설정 입니다.
+```
+택시호출 서비스 : 8081
+택시관리 서비스 : 8082
+택시호출 서비스 : 8083
+```
 
 gateway > applitcation.yml 설정
 
