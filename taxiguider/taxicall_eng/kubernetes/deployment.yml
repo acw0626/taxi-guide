@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: taxicall
-          image: skccteam03.azurecr.io/taxicall:v1
+          image: skccteam03.azurecr.io/taxicalleng:v2
           ports:
             - containerPort: 8080
           readinessProbe:

@@ -441,27 +441,27 @@ http localhost:8081/택시호출s 휴대폰번호="01012345678" 호출상태="�
 ======================================================================================================================
 # 운영
 
-## Deploy / Pipeline
+## 쿠버네티스 배포 및 파이라인 작업
 
-- 네임스페이스 만들기
+- 네임스페이스 만들기 : team03
 ```
-kubectl create ns phone82
-kubectl get ns
+kubectl create namespace team03
+kubectl get namespace team03
 ```
-![image](https://user-images.githubusercontent.com/73699193/97960790-6d20ef00-1df5-11eb-998d-d5591975b5d4.png)
+![image](screenshots/create_namespace.png "네임스페이스 생성")
 
-- 폴더 만들기, 해당폴더로 이동
+- team 폴더로 이동
 ```
-mkdir phone82
-cd phone 82
+cd team
 ```
-![image](https://user-images.githubusercontent.com/73699193/97961127-0ea84080-1df6-11eb-81b3-1d5e460d4c0f.png)
+![image](screenshots/cd_team.png "네임스페이스 생성")
 
 - 소스 가져오기
 ```
-git clone https://github.com/phone82/app.git
+git clone https://github.com/tommybee-dev/taxi-guide.git
 ```
 ![image](https://user-images.githubusercontent.com/73699193/98089346-eb4cc680-1ec5-11eb-9c23-f6987dee9308.png)
+![image](screenshots/git_clone.png "git에서 클론")
 
 - 빌드하기
 ```

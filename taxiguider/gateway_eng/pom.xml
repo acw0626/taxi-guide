@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>boot-camp-gateway</artifactId>
+	<artifactId>teamgateway_eng</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>boot-camp-gateway</name>
 

@@ -44,19 +44,19 @@ spring:
     gateway:
       routes:
         - id: taxicall
-          uri: http://localhost:8080
+          uri: http://taxicall:8080
           predicates:
             - Path=/택시호출s/** 
         - id: taximanage
-          uri: http://localhost:8080
+          uri: http://taximanage:8080
           predicates:
             - Path=/택시관리s/** 
         - id: customer
-          uri: http://localhost:8080
+          uri: http://customer:8080
           predicates:
             - Path= /택시호출정보/**
         - id: taxiassign
-          uri: http://localhost:8080
+          uri: http://taxiassign:8080
           predicates:
             - Path=/택시할당s/** 
       globalcors:

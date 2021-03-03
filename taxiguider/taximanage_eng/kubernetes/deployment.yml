@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: taximanage
-          image: skccteam03.azurecr.io/taximanage:v1
+          image: skccteam03.azurecr.io/taximanageeng:v1
           ports:
             - containerPort: 8080
           readinessProbe:

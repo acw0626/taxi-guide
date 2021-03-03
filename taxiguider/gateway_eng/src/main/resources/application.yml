@@ -11,19 +11,15 @@ spring:
         - id: taxicall
           uri: http://localhost:8081
           predicates:
-            - Path=/택시호출s/** 
+            - Path=/taxicalls/** 
         - id: taximanage
           uri: http://localhost:8082
           predicates:
-            - Path=/택시관리s/** 
-        - id: customer
-          uri: http://localhost:8083
-          predicates:
-            - Path= /택시호출정보/**
+            - Path=/taximanages/** 
         - id: taxiassign
           uri: http://localhost:8084
           predicates:
-            - Path=/택시할당s/** 
+            - Path=/taxiassigns/** 
       globalcors:
         corsConfigurations:
           '[/**]':
@@ -46,19 +42,15 @@ spring:
         - id: taxicall
           uri: http://taxicall:8080
           predicates:
-            - Path=/택시호출s/** 
+            - Path=/taxicalls/** 
         - id: taximanage
           uri: http://taximanage:8080
           predicates:
-            - Path=/택시관리s/** 
-        - id: customer
-          uri: http://customer:8080
-          predicates:
-            - Path= /택시호출정보/**
+            - Path=/taximanages/** 
         - id: taxiassign
           uri: http://taxiassign:8080
           predicates:
-            - Path=/택시할당s/** 
+            - Path=/taxiassigns/** 
       globalcors:
         corsConfigurations:
           '[/**]':
