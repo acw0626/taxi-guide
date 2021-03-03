@@ -150,30 +150,24 @@ Eventual Consistency 를 기본으로 채택함.
 
 # 구현:
 
-서비스를 로컬에서 실행하는 방법은 아래와 같다 
-각 서비스별로 bat 파일로 실행한다. 
+서비스를 로컬에서 실행하는 방법은 아래와 같으며, 실행의 편의성을 위해서
+각 서비스별로 bat 파일로 묶어서 실행 합니다. 
 
 ```
 - run_taxicall.bat
 call setenv.bat
-REM java  -Xmx400M -Djava.security.egd=file:/dev/./urandom -jar food-delivery\app\target\app-0.0.1-SNAPSHOT.jar --spring.profiles.active=docker
-REM java  -Xmx400M -Djava.security.egd=file:/dev/./urandom -jar food-delivery\app\target\app-0.0.1-SNAPSHOT.jar --spring.profiles.active=default
 cd ..\taxiguider\taxicall
 mvn clean spring-boot:run
 pause ..
 
 - run_taximanage.bat
 call setenv.bat
-REM java  -Xmx400M -Djava.security.egd=file:/dev/./urandom -jar food-delivery\pay\target\pay-0.0.1-SNAPSHOT.jar --spring.profiles.active=docker
-REM java  -Xmx400M -Djava.security.egd=file:/dev/./urandom -jar food-delivery\pay\target\pay-0.0.1-SNAPSHOT.jar --spring.profiles.active=default
 cd ..\taxiguider\taximanage
 mvn clean spring-boot:run
 pause ..
 
 - run_taxiassign.bat
 call setenv.bat
-REM java  -Xmx400M -Djava.security.egd=file:/dev/./urandom -jar food-delivery\store\target\store-0.0.1-SNAPSHOT.jar --spring.profiles.active=docker
-REM java  -Xmx400M -Djava.security.egd=file:/dev/./urandom -jar food-delivery\store\target\store-0.0.1-SNAPSHOT.jar --spring.profiles.active=default
 cd ..\taxiguider\taxiassign
 mvn clean spring-boot:run
 pause ..
@@ -189,7 +183,8 @@ pause ..
 ```
 
 ## DDD 의 적용
-총 3개의 Domain 으로 관리되고 있으며, 택시요청(Taxicall) , 택시관리(TaxiManage), 택시할당(TaxiAssign) 으로 구성된다. 
+총 3개의 Domain 으로 관리되고 있으며, 택시요청(Taxicall) , 택시관리(TaxiManage), 택시할당(TaxiAssign) 으로 구성하였습니다. 
+
 
 
 ![DDD](https://user-images.githubusercontent.com/78134019/109460756-74ef5800-7aa4-11eb-8140-ec3ebb47a63f.jpg)
@@ -217,11 +212,12 @@ pause ..
 
 ## 마이크로 서비스 호출 흐름
 
-- taxicall 서비스 호출처리
-호출(taxicall)->택시관리(taximanage) 간의 호출처리 됨.
-택시 할당에서 택시기사를 할당하여 호출 확정 상태가 됨.
-두 개의 호출 상태
-를 만듬.
+- taxicall 서비스 호출처리 
+
+호출(taxicall)->택시관리(taximanage) 우선 호출처리(req/res) 되며,
+택시할당(taxiassign)에서 택시기사를 할당하게 되면 호출 상태가 호출에서 호출확정 상태가 됩니다
+
+우선, 다음과 같이 두 개의 호출 상태를 만듭니다.
 ```
 http localhost:8081/택시호출s 휴대폰번호="01012345678" 호출상태=호출 호출위치="마포" 예상요금=25000
 http localhost:8081/택시호출s 휴대폰번호="01056789012" 호출상태=호출 호출위치="서대문구" 예상요금=30000
@@ -232,7 +228,7 @@ http localhost:8081/택시호출s 휴대폰번호="01056789012" 호출상태=호
 
 
 
-호출 결과는 모두 택시 할당(taxiassign)에서 택시기사의 할당으로 처리되어 호출 확정 상태가 되어 있음.
+아래 호출 결과는 모두 택시 할당(taxiassign)에서 택시기사의 할당되어 호출 서비스를 확인하연 호출 상태는 호출 확정가 되어 있습니다.
 
 ![3](https://user-images.githubusercontent.com/78134019/109771602-58882280-7c40-11eb-93c4-a3831156c151.png)
 
@@ -244,14 +240,14 @@ http localhost:8081/택시호출s 휴대폰번호="01056789012" 호출상태=호
 
 - taxicall 서비스 호출 취소 처리
 
-호출 취소는 택시호출에서 다음과 같이 호출 하나를 취소 함으로써 진행 함.
+호출 취소는 택시호출에서 다음과 같이 호출 하나를 취소 함으로써 진행 합니다.
 
 ```
 http delete http://localhost:8081/택시호출s/1
 HTTP/1.1 204
 Date: Tue, 02 Mar 2021 16:59:12 GMT
 ```
-호출이 취소 되면 택시 호출이 하나가 삭제 되었고, 
+호출이 취소 되면 아래와 같이 택시 호출이 하나가 삭제 되었고, 
 
 ```
 http localhost:8081/택시호출s/
@@ -260,7 +256,7 @@ http localhost:8081/택시호출s/
 ![6](https://user-images.githubusercontent.com/78134019/109771698-7a81a500-7c40-11eb-964e-a07e989f997c.png)
 
 
-택시관리에서는 해당 호출에 대해서 호출취소로 상태가 변경 됨.
+택시관리에서는 해당 호출의 호출 상태가 호출취소로 상태가 변경 됩니다.
 
 ```
 http localhost:8082/택시관리s/
@@ -269,30 +265,38 @@ http localhost:8082/택시관리s/
 ![7](https://user-images.githubusercontent.com/78134019/109771726-83727680-7c40-11eb-88bd-169a8d6184fe.png)
 
 
-- 고객 메시지 서비스 처리 고객(customer)는 호출 확정과 할당 확정에 대한 메시지를 다음과 같이 받을 수 있으며,
-할당 된 택시기사의 정보를 또한 확인 할 수 있다.
-파이썬으로 구현 하였음.
+- 고객 메시지 서비스 처리 
+
+고객(customer)는 호출 확정과 할당 확정에 대한 메시지를 다음과 같이 받을 수 있으며,
+할당 된 택시기사의 정보를 또한 확인 할 수 있습니다.
+파이썬으로 구현 하였습니다.
 
 ![8](https://user-images.githubusercontent.com/78134019/109771811-9ab16400-7c40-11eb-8a49-57156a4d0c8e.png)
 
 
 ## Gateway 적용
 
-서비스에 대한 하나의 접점을 만들기 위한 게이트웨이의 설정은 8088로 설정 하였으며, 다음 마이크로서비스에 대한 설정 입니다.
+서비스에 대한 하나의 접점을 만들기 위한 게이트웨이의 설정은 8088이며, 
+택시호출,택시관리 및 택시할당 마이크로서비스에 대한 일원화 된 접점을 제공하기 위한 설정 입니다.
 ```
 택시호출 서비스 : 8081
 택시관리 서비스 : 8082
-택시호출 서비스 : 8083
+택시할당 서비스 : 8083
 ```
 
 gateway > applitcation.yml 설정
 
 ![gateway_1](https://user-images.githubusercontent.com/78134019/109480363-c73d7280-7abe-11eb-9904-0c18e79072eb.png)
 
+아래 설정은 DDD를 통해서 구현 된 한글화 된 서비스를 클라우드에서 호출 할 경우, 문제가 발생하여 모든 도메인 명 및 서비스를 
+영어로 재 구현 하였으며, 이에 대한 게이트웨이 처리를 보여주고 있습니다.
+
 ![gateway_2](https://user-images.githubusercontent.com/78134019/109480386-d02e4400-7abe-11eb-9251-a813ac911e0d.png)
 
 
-gateway 테스트
+- gateway 로컬 테스트
+
+로컬 테스트는 다음과 같이 한글 서비스 호출로 테스트 되었습니다.
 
 ```
 http localhost:8080/택시호출s
@@ -304,10 +308,10 @@ http localhost:8080/택시호출s
 
 ## 동기식 호출 과 Fallback 처리
 
-호출(taxicall)->택시관리(taximanage) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리함.
+호출(taxicall)->택시관리(taximanage) 간의 호출은 동기식 일관성을 유지하는 트랜잭션으로 처리하였습니다.
 호출 프로토콜은 이미 앞서 Rest Repository 에 의해 노출되어있는 REST 서비스를 FeignClient 를 이용하여 호출하도록 한다. 
 
-
+로컬 테스트를 위한 파일은 다음과 같이 구현 하였으며,
 ```
 # external > 택시관리Service.java
 
@@ -330,6 +334,31 @@ public interface 택시관리Service {
 
 ```
 
+클라우드 배포시 구현은 영문 클래스 해당 URL 호출은 다음과 같이 구현 하였습니다.
+
+```
+# external > TaximanageService.java
+
+
+package taxiguider.external;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+//@FeignClient(name="taximanage", url="http://localhost:8082")
+//@FeignClient(name="taximanage", url="http://localhost:8082", fallback = TaximanageServiceFallback.class)
+@FeignClient(name="taximanage", url="http://taximanage:8080", fallback = TaximanageServiceFallback.class)
+public interface TaximanageService {
+
+    @RequestMapping(method= RequestMethod.POST, path="/taximanages")
+    public void requestTaxiAssign(@RequestBody Taximanage txMange);
+
+}
+
+```
+
 ```
 # external > 택시관리ServiceFallback.java
 
@@ -341,12 +370,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class 택시관리ServiceFallback implements 택시관리Service {
 	 
-	//@Override
-	//public void 택시할당요청(택시관리 택시관리) 
-	//{	
-	//	System.out.println("Circuit breaker has been opened. Fallback returned instead.");
-	//}
-	
 	
 	@Override
 	public void 택시할당요청(택시관리 택시관리) {
@@ -359,9 +382,12 @@ public class 택시관리ServiceFallback implements 택시관리Service {
 ```
 
 ![동기식](https://user-images.githubusercontent.com/78134019/109463569-97837000-7aa8-11eb-83c4-6f6eff1594aa.jpg)
+![2021-03-04_004922](https://user-images.githubusercontent.com/7607807/109832226-80e54080-7c83-11eb-9526-e1820a60c938.png)
 
 
-- 택시호출을 하면 택시관리가 호출되도록..
+- 로컬 택시 할당요청
+
+택시호출을 하면 택시관리에 택시 할당 요청을 다음과 같이 동기적으로 진행 합니다.
 ```
 # 택시호출.java
 
@@ -392,7 +418,44 @@ public class 택시관리ServiceFallback implements 택시관리Service {
 		}
 ```
 
+- 클라우드 배포시 영문 택시 할당요청
+
+택시호출을 하면 택시관리에 택시 할당 요청을 다음과 같이 동기적으로 진행 합니다.
+```
+# 택시호출.java
+
+@PostPersist
+public void onPostPersist(){
+	System.out.println("휴대폰번호 " + getTel());
+	System.out.println("호출위치 " + getLocation());
+	System.out.println("호출상태 " + getStatus());
+	System.out.println("예상요금 " + getCost());
+	//Following code causes dependency to external APIs
+	// it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.   	
+	if(getTel() != null)
+	{
+		System.out.println("SEND###############################" + getId());
+		Taximanage txMgr = new Taximanage();
+		txMgr.setId(getId());
+		txMgr.setOrderId(String.valueOf(getId()));
+		txMgr.setTel(getTel());
+		if(getLocation()!=null) 
+			txMgr.setLocation(getLocation());
+		if(getStatus()!=null) 
+			txMgr.setStatus(getStatus());
+		if(getCost()!=null) 
+			txMgr.setCost(getCost());
+		
+		// mappings goes here
+		TaxicallApplication.applicationContext.getBean(TaximanageService.class)
+			.requestTaxiAssign(txMgr);;
+	}
+
+}
+```
+
 ![동기식2](https://user-images.githubusercontent.com/78134019/109463985-47f17400-7aa9-11eb-8603-c1f83e17951d.jpg)
+![2021-03-04_005205](https://user-images.githubusercontent.com/7607807/109832649-e6393180-7c83-11eb-822f-bd41957e7a65.png)
 
 - 동기식 호출 적용으로 택시 관리 시스템이 정상적이지 않으면 , 택시콜도 접수될 수 없음을 확인 
 ```
@@ -405,9 +468,8 @@ C:\Users\Administrator>http localhost:8081/택시호출s 휴대폰번호="010123
 
 ![택시관리죽으면택시콜놉](https://user-images.githubusercontent.com/78134019/109464780-905d6180-7aaa-11eb-9c90-e7d1326deea1.jpg)
 
-```
 # 택시 관리 (taximanage) 재기동 후 주문하기
-
+```
 #주문하기(order)
 http localhost:8081/택시호출s 휴대폰번호="01012345678" 호출상태="호출"
 ```
