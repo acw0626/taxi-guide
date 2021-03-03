@@ -79,6 +79,10 @@
 
 ![바운디드](https://user-images.githubusercontent.com/78134019/109457090-8123e700-7a9d-11eb-82c1-8567db428b25.jpg)
 
+    - 도메인 서열 분리 
+        - Core Domain:  app(front), store : 없어서는 안될 핵심 서비스이며, 연견 Up-time SLA 수준을 99.999% 목표, 배포주기는 app 의 경우 1주일 1회 미만, store 의 경우 1개월 1회 미만
+        - Supporting Domain:  customer(view) : 경쟁력을 내기위한 서비스이며, SLA 수준은 연간 60% 이상 uptime 목표, 배포주기는 각 팀의 자율이나 표준 스프린트 주기가 1주일 이므로 1주일 1회 이상을 기준으로 함.
+        - General Domain:  pay : 결제서비스로 3rd Party 외부 서비스를 사용하는 것이 경쟁력이 높음 
 
 ### 폴리시 부착 (괄호는 수행주체, 폴리시 부착을 둘째단계에서 해놔도 상관 없음. 전체 연계가 초기에 드러남)
 
@@ -142,38 +146,30 @@ Eventual Consistency 를 기본으로 채택함.
 
 ## 헥사고날 아키텍처 다이어그램 도출 (Polyglot)
 
-![핵사고날_최종](https://user-images.githubusercontent.com/78134019/109744745-29f55200-7c16-11eb-8981-88924ad28cb3.jpg)
-
-
+![핵사고날수정됨](screenshots/hexagonal_archi.png "헥사고날아키텍처")
 
 
 
 # 구현:
 
 서비스를 로컬에서 실행하는 방법은 아래와 같다 
-각 서비스별로 bat 파일로 실행한다. 
+각 서비스별로 bat 을 파일로 실행한다. 
 
 ```
 - run_taxicall.bat
 call setenv.bat
-REM java  -Xmx400M -Djava.security.egd=file:/dev/./urandom -jar food-delivery\app\target\app-0.0.1-SNAPSHOT.jar --spring.profiles.active=docker
-REM java  -Xmx400M -Djava.security.egd=file:/dev/./urandom -jar food-delivery\app\target\app-0.0.1-SNAPSHOT.jar --spring.profiles.active=default
 cd ..\taxiguider\taxicall
 mvn clean spring-boot:run
 pause ..
 
 - run_taximanage.bat
 call setenv.bat
-REM java  -Xmx400M -Djava.security.egd=file:/dev/./urandom -jar food-delivery\pay\target\pay-0.0.1-SNAPSHOT.jar --spring.profiles.active=docker
-REM java  -Xmx400M -Djava.security.egd=file:/dev/./urandom -jar food-delivery\pay\target\pay-0.0.1-SNAPSHOT.jar --spring.profiles.active=default
 cd ..\taxiguider\taximanage
 mvn clean spring-boot:run
 pause ..
 
 - run_taxiassign.bat
 call setenv.bat
-REM java  -Xmx400M -Djava.security.egd=file:/dev/./urandom -jar food-delivery\store\target\store-0.0.1-SNAPSHOT.jar --spring.profiles.active=docker
-REM java  -Xmx400M -Djava.security.egd=file:/dev/./urandom -jar food-delivery\store\target\store-0.0.1-SNAPSHOT.jar --spring.profiles.active=default
 cd ..\taxiguider\taxiassign
 mvn clean spring-boot:run
 pause ..
@@ -186,6 +182,21 @@ cd ..\taxiguider_py\customer\
 python policy-handler.py 
 pause ..
 
+```
+
+setenv.bat
+```
+SET JAVA_HOME=C:\DEV\SDK\JDK\jdk1.8.0_131
+SET MVN_HOME=C:\DEV\Tools\apache-maven-3.6.3
+SET NODE_HOME=C:\DEV\Tools\nodejs
+SET KAFKA_HOME=C:\DEV\Tools\kafka_2.13-2.7.0
+SET ANACONDA_HOME=C:\DEV\SDK\Anaconda3
+SET MONGO_HOME=C:\DEV\Tools\mongodb
+SET MARIA_HOME=C:\DEV\Tools\mariadb-10.3.13-winx64
+SET MARIA_DATA=C:\DEV\DATA\mariadb
+
+
+SET PATH=%MARIA_HOME%\BIN;%MONGO_HOME%\BIN;%KAFKA_HOME%\BIN\WINDOWS;%JAVA_HOME%\BIN;%MVN_HOME%\BIN;%PATH%;
 ```
 
 ## DDD 의 적용
@@ -201,19 +212,14 @@ pause ..
 
 ## 폴리글랏 퍼시스턴스
 
-```
-위치 : /taxiguider>taximanage>pom.xml
-```
-![폴리그랏DB_최종](https://user-images.githubusercontent.com/78134019/109745194-d800fc00-7c16-11eb-87bd-2f65884a5f71.jpg)
 
+
+![폴리그랏](https://user-images.githubusercontent.com/78134019/109483794-02da3b80-7ac3-11eb-8714-40f1f41164bb.jpg)
 
 
 ## 폴리글랏 프로그래밍 - 파이썬
-```
-위치 : /taxiguider_py>cutomer>policy-handler.py
-```
-![폴리그랏프로그래밍](https://user-images.githubusercontent.com/78134019/109745241-ebac6280-7c16-11eb-8839-6c974340839b.jpg)
 
+![폴리그랏프로그래밍](https://user-images.githubusercontent.com/78134019/109489189-dbd33800-7ac9-11eb-86f5-bbdb072454ce.jpg)
 
 ## 마이크로 서비스 호출 흐름
 
@@ -226,20 +232,15 @@ pause ..
 http localhost:8081/택시호출s 휴대폰번호="01012345678" 호출상태=호출 호출위치="마포" 예상요금=25000
 http localhost:8081/택시호출s 휴대폰번호="01056789012" 호출상태=호출 호출위치="서대문구" 예상요금=30000
 ```
-![taxicall1](https://user-images.githubusercontent.com/78134019/109771576-51611480-7c40-11eb-8754-94d35a5703ec.png)
 
-![taxicall2](https://user-images.githubusercontent.com/78134019/109771589-545c0500-7c40-11eb-997a-90249ea8f912.png)
-
-
+![image](screenshots/taxicall1.png "taxicall 서비스 호출")
+![image](screenshots/taxicall2.png "taxicall 서비스 호출")
 
 호출 결과는 모두 택시 할당(taxiassign)에서 택시기사의 할당으로 처리되어 호출 확정 상태가 되어 있음.
 
-![3](https://user-images.githubusercontent.com/78134019/109771602-58882280-7c40-11eb-93c4-a3831156c151.png)
-
-![4](https://user-images.githubusercontent.com/78134019/109771654-69d12f00-7c40-11eb-9d2c-4807f0c3d726.png)
-
-![5](https://user-images.githubusercontent.com/78134019/109771661-6c338900-7c40-11eb-8a4a-9a758a8d1613.png)
-
+![image](screenshots/taxicall_result1.png "taxicall 서비스 호출 결과")
+![image](screenshots/taxicall_result2.png "taxicall 서비스 호출 결과")
+![image](screenshots/taximanage_result1.png "taxicall 서비스 호출 결과 - 택시관리")
 
 
 - taxicall 서비스 호출 취소 처리
@@ -256,8 +257,7 @@ Date: Tue, 02 Mar 2021 16:59:12 GMT
 ```
 http localhost:8081/택시호출s/
 ```
-
-![6](https://user-images.githubusercontent.com/78134019/109771698-7a81a500-7c40-11eb-964e-a07e989f997c.png)
+![image](screenshots/taxicancel_result.png "taxicall 서비스 호출취소 결과")
 
 
 택시관리에서는 해당 호출에 대해서 호출취소로 상태가 변경 됨.
@@ -265,15 +265,14 @@ http localhost:8081/택시호출s/
 ```
 http localhost:8082/택시관리s/
 ```
+![image](screenshots/taximanage_result.png "taxicall 서비스 호출취소 결과")
 
-![7](https://user-images.githubusercontent.com/78134019/109771726-83727680-7c40-11eb-88bd-169a8d6184fe.png)
-
-
-- 고객 메시지 서비스 처리 고객(customer)는 호출 확정과 할당 확정에 대한 메시지를 다음과 같이 받을 수 있으며,
+- 고객 메시지 서비스 처리
+고객(customer)는 호출 확정과 할당 확정에 대한 메시지를 다음과 같이 받을 수 있으며,
 할당 된 택시기사의 정보를 또한 확인 할 수 있다.
 파이썬으로 구현 하였음.
 
-![8](https://user-images.githubusercontent.com/78134019/109771811-9ab16400-7c40-11eb-8a49-57156a4d0c8e.png)
+![image](screenshots/customer.png "호출 결과에 대한 고객 메시지")
 
 
 ## Gateway 적용
@@ -439,170 +438,86 @@ http localhost:8081/택시호출s 휴대폰번호="01012345678" 호출상태="�
 ![고객View](https://user-images.githubusercontent.com/78134019/109483385-80ea1280-7ac2-11eb-9419-bf3ff5a0dbbc.png)
 
 
----mvn MSA Service
-<gateway>
-	
-![mvn_gateway](https://user-images.githubusercontent.com/78134019/109744124-244b3c80-7c15-11eb-80a9-bed42413aa58.png)
-	
-<taxicall>
-	
-![mvn_taxicall](https://user-images.githubusercontent.com/78134019/109744165-31682b80-7c15-11eb-9d94-7bc23efca6b6.png)
-
-<taximanage>
-	
-![mvn_taximanage](https://user-images.githubusercontent.com/78134019/109744195-3b8a2a00-7c15-11eb-9554-1c3ba088af52.png)
-
-<taxiassign>
-	
-![mvn_taxiassign](https://user-images.githubusercontent.com/78134019/109744226-46dd5580-7c15-11eb-8b47-5100ed01e3ae.png)
-
-
+======================================================================================================================
 # 운영
 
-## Deploy / Pipeline
+## 쿠버네티스 배포 및 파이라인 작업
 
-- az login
+- 네임스페이스 만들기 : team03
 ```
-{
-    "cloudName": "AzureCloud",
-    "homeTenantId": "6011e3f8-2818-42ea-9a63-66e6acc13e33",
-    "id": "718b6bd0-fb75-4ec9-9f6e-08ae501f92ca",
-    "isDefault": true,
-    "managedByTenants": [],
-    "name": "2",
-    "state": "Enabled",
-    "tenantId": "6011e3f8-2818-42ea-9a63-66e6acc13e33",
-    "user": {
-      "name": "skTeam03@gkn2021hotmail.onmicrosoft.com",
-      "type": "user"
-    }
-  }
+kubectl create namespace team03
+kubectl get namespace team03
 ```
+![image](screenshots/create_namespace.png "네임스페이스 생성")
 
-
-- account set 
+- team 폴더로 이동
 ```
-az account set --subscription "종량제2"
+cd team
 ```
+![image](screenshots/cd_team.png "네임스페이스 생성")
 
-
-- 리소스그룹생성
+- 소스 가져오기
 ```
-그룹명 : skccteam03-rsrcgrp
+git clone https://github.com/tommybee-dev/taxi-guide.git
 ```
+![image](https://user-images.githubusercontent.com/73699193/98089346-eb4cc680-1ec5-11eb-9c23-f6987dee9308.png)
+![image](screenshots/git_clone.png "git에서 클론")
 
-
-- 클러스터 생성
+- 빌드하기
 ```
-클러스터 명 : skccteam03-aks
+cd app
+mvn package -Dmaven.test.skip=true
 ```
+![image](https://user-images.githubusercontent.com/73699193/98089442-19320b00-1ec6-11eb-88b5-544cd123d62a.png)
 
-- 토큰 가져오기
+- 도커라이징: Azure 레지스트리에 도커 이미지 푸시하기
 ```
-az aks get-credentials --resource-group skccteam03-rsrcgrp --name skccteam03-aks
+az acr build --registry admin02 --image admin02.azurecr.io/app:latest .
 ```
+![image](https://user-images.githubusercontent.com/73699193/98089685-6dd58600-1ec6-11eb-8fb9-80705c854c7b.png)
 
-- aks에 acr 붙이기
+- 컨테이너라이징: 디플로이 생성 확인
 ```
-az aks update -n skccteam03-aks -g skccteam03-rsrcgrp --attach-acr skccteam03
+kubectl create deploy app --image=admin02.azurecr.io/app:latest -n phone82
+kubectl get all -n phone82
 ```
+![image](https://user-images.githubusercontent.com/73699193/98090560-83977b00-1ec7-11eb-9770-9cfe1021f0b4.png)
 
-![aks붙이기](https://user-images.githubusercontent.com/78134019/109653395-540e2c00-7ba4-11eb-97dd-2dcfdf5dc539.jpg)
-
-네임스페이스 만들기
-
+- 컨테이너라이징: 서비스 생성 확인
 ```
-kubectl create ns team03
-kubectl get ns
+kubectl expose deploy app --type="ClusterIP" --port=8080 -n phone82
+kubectl get all -n phone82
 ```
-![image](https://user-images.githubusercontent.com/78134019/109776836-5cb73e80-7c46-11eb-9562-d462525d6dab.png)
+![image](https://user-images.githubusercontent.com/73699193/98090693-b80b3700-1ec7-11eb-959e-fc0ce94663aa.png)
+
+- pay, store, customer, gateway에도 동일한 작업 반복
 
 
 
 
+-(별첨)deployment.yml을 사용하여 배포 
 
-* 도커 이미지 만들어서 올리기
+- deployment.yml 편집
 ```
-cd gateway
-az acr build --registry skccteam03 --image skccteam03.azurecr.io/gateway:v1 .
-az acr build --registry skccteam03 --image skccteam03.azurecr.io/gateway:v2 .
-cd ..
-cd taxicall
-az acr build --registry skccteam03 --image skccteam03.azurecr.io/taxicall:v1 .
-cd ..
-cd taximanage
-az acr build --registry skccteam03 --image skccteam03.azurecr.io/taximanage:v1 .
-cd ..
-cd taxiassign
-az acr build --registry skccteam03 --image skccteam03.azurecr.io/taxiassign:v1 .
-cd ..
-
-cd customer_py
-az acr build --registry skccteam03 --image skccteam03.azurecr.io/customer-policy-handler:v1 .
-
-az acr build --registry skccteam03 --image skccteam03.azurecr.io/customer-policy-handler:v2 .
-
-
-az acr build --registry [acr-registry-name] --image [acr-registry-name].azurecr.io/products:v1 .
+namespace, image 설정
+env 설정 (config Map) 
+readiness 설정 (무정지 배포)
+liveness 설정 (self-healing)
+resource 설정 (autoscaling)
 ```
-
-![docker_gateway](https://user-images.githubusercontent.com/78134019/109777813-76a55100-7c47-11eb-8d8d-59eaabefab54.png)
-
-![docker_taxiassign](https://user-images.githubusercontent.com/78134019/109777820-77d67e00-7c47-11eb-9d77-85403dcf2da4.png)
-
-![docker_taxicall](https://user-images.githubusercontent.com/78134019/109777826-786f1480-7c47-11eb-9992-41f75907d16f.png)
-
-![docker_taximanage](https://user-images.githubusercontent.com/78134019/109777827-786f1480-7c47-11eb-9c9b-d3357eda0bd5.png)
-
-![docker_customer](https://user-images.githubusercontent.com/78134019/109777829-7907ab00-7c47-11eb-936f-723396cb272a.png)
-
-
-
-
-
--deployment.yml을 사용하여 배포 
-
-
-![deployment_yml](https://user-images.githubusercontent.com/78134019/109652001-9171ba00-7ba2-11eb-8c29-7128ceb4ec97.jpg)
+![image](https://user-images.githubusercontent.com/73699193/98092861-8182eb80-1eca-11eb-87c5-afa22140ebad.png)
 
 - deployment.yml로 서비스 배포
 ```
 cd app
 kubectl apply -f kubernetes/deployment.yml
 ```
-<Deploy cutomer>
-	
-![deploy_customer](https://user-images.githubusercontent.com/78134019/109744443-a471a200-7c15-11eb-94c9-a0c0a7999d04.png)
-
-<Deploy gateway>
-	
-![deploy_gateway](https://user-images.githubusercontent.com/78134019/109744457-acc9dd00-7c15-11eb-8502-ff65e779e9d2.png)
-
-<Deploy taxiassign>
-	
-![deploy_taxiassign](https://user-images.githubusercontent.com/78134019/109744471-b3585480-7c15-11eb-8d68-bba9c3d8ce01.png)
-
-<Deploy taxicall>
-	
-![deploy_taxicall](https://user-images.githubusercontent.com/78134019/109744487-bb17f900-7c15-11eb-8bd0-ff0a9fc9b2e3.png)
-
-
-
-![deploy_taximanage](https://user-images.githubusercontent.com/78134019/109744591-e69ae380-7c15-11eb-834a-44befae55092.png)
-
-
-
-서비스확인
-```
-kubectl get all -n team03
-```
-![image](https://user-images.githubusercontent.com/78134019/109777026-9be58f80-7c46-11eb-9eac-a55ebcf91989.png)
-
-
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 
 * 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
+
+시나리오는 단말앱(app)-->결제(pay) 시의 연결을 RESTful Request/Response 로 연동하여 구현이 되어있고, 결제 요청이 과도할 경우 CB 를 통하여 장애격리.
 
 - Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 610 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
 ```
@@ -610,15 +525,7 @@ kubectl get all -n team03
 feign:
   hystrix:
     enabled: true
-
-# To set thread isolation to SEMAPHORE
-#hystrix:
-#  command:
-#    default:
-#      execution:
-#        isolation:
-#          strategy: SEMAPHORE
-
+    
 hystrix:
   command:
     # 전역설정
@@ -626,98 +533,109 @@ hystrix:
       execution.isolation.thread.timeoutInMilliseconds: 610
 
 ```
-![hystrix](https://user-images.githubusercontent.com/78134019/109652345-0218d680-7ba3-11eb-847b-708ba071c119.jpg)
+![image](https://user-images.githubusercontent.com/73699193/98093705-a166df00-1ecb-11eb-83b5-f42e554f7ffd.png)
 
-
-부하테스트
-
-
-* Siege Run
+* siege 툴 사용법:
+```
+ siege가 생성되어 있지 않으면:
+ kubectl run siege --image=apexacme/siege-nginx -n phone82
+ siege 들어가기:
+ kubectl exec -it pod/siege-5c7c46b788-4rn4r -c siege -n phone82 -- /bin/bash
+ siege 종료:
+ Ctrl + C -> exit
+```
+* 부하테스터 siege 툴을 통한 서킷 브레이커 동작 확인:
+- 동시사용자 100명
+- 60초 동안 실시
 
 ```
-kubectl run siege --image=apexacme/siege-nginx -n team03
+siege -c100 -t60S -r10 -v --content-type "application/json" 'http://app:8080/orders POST {"item": "abc123", "qty":3}'
 ```
+- 부하 발생하여 CB가 발동하여 요청 실패처리하였고, 밀린 부하가 pay에서 처리되면서 다시 order를 받기 시작 
 
-* 실행
-
-```
-kubectl exec -it pod/siege-5459b87f86-hlfm9 -c siege -n team03 -- /bin/bash
-```
-
-*부하 실행
-
-```
-siege -c200 -t60S -r10 -v --content-type "application/json" 'http://20.194.36.201:8080/taxicalls POST {"tel": "0101231234"}'
-```
-
-- 부하 발생하여 CB가 발동하여 요청 실패처리하였고, 밀린 부하가 pay에서 처리되면서 다시 taxicall 받기 시작 
-
-![secs1](https://user-images.githubusercontent.com/78134019/109786899-01d71480-7c51-11eb-9e6c-0a819e85b020.png)
-
+![image](https://user-images.githubusercontent.com/73699193/98098702-07eefb80-1ed2-11eb-94bf-316df4bf682b.png)
 
 - report
 
-![secs2](https://user-images.githubusercontent.com/78134019/109786922-07345f00-7c51-11eb-900a-315f7d0d6484.png)
+![image](https://user-images.githubusercontent.com/73699193/98099047-6e741980-1ed2-11eb-9c55-6fe603e52f8b.png)
 
-
-
+- CB 잘 적용됨을 확인
 
 
 ### 오토스케일 아웃
 
-
+- 대리점 시스템에 대한 replica 를 동적으로 늘려주도록 HPA 를 설정한다. 설정은 CPU 사용량이 15프로를 넘어서면 replica 를 10개까지 늘려준다:
 
 ```
 # autocale out 설정
- deployment.yml 설정
+store > deployment.yml 설정
 ```
-
-
-![auto1](https://user-images.githubusercontent.com/78134019/109794479-3ea70980-7c59-11eb-8d32-fbc039106c8c.jpg)
-
+![image](https://user-images.githubusercontent.com/73699193/98187434-44fbd200-1f54-11eb-9859-daf26f812788.png)
 
 ```
-kubectl autoscale deploy taxicall --min=1 --max=10 --cpu-percent=15 -n team03
+kubectl autoscale deploy store --min=1 --max=10 --cpu-percent=15 -n phone82
 ```
+![image](https://user-images.githubusercontent.com/73699193/98100149-ce1ef480-1ed3-11eb-908e-a75b669d611d.png)
 
 
+-
+- CB 에서 했던 방식대로 워크로드를 2분 동안 걸어준다.
 ```
-root@labs--279084598:/home/project# kubectl exec -it pod/siege-5459b87f86-hlfm9 -c siege -n team03 -- /bin/bash
-root@siege-5459b87f86-hlfm9:/# siege -c100 -t120S -r10 -v --content-type "application/json" 'http://20.194.36.201:8080/taxicalls POST {"tel": "0101231234"}'
+kubectl exec -it pod/siege-5c7c46b788-4rn4r -c siege -n phone82 -- /bin/bash
+siege -c100 -t120S -r10 -v --content-type "application/json" 'http://store:8080/storeManages POST {"orderId":"456", "process":"Payed"}'
 ```
-![auto4](https://user-images.githubusercontent.com/78134019/109794919-b70dca80-7c59-11eb-9710-8ff6b4dd5f54.jpg)
-
-
+![image](https://user-images.githubusercontent.com/73699193/98102543-0d9b1000-1ed7-11eb-9cb6-91d7996fc1fd.png)
 
 - 오토스케일이 어떻게 되고 있는지 모니터링을 걸어둔다:
 ```
-kubectl get deploy taxicall -w -n team03
+kubectl get deploy store -w -n phone82
 ```
-![auto_final](https://user-images.githubusercontent.com/78134019/109796515-98a8ce80-7c5b-11eb-9512-a0a927217a38.jpg)
+- 어느정도 시간이 흐른 후 스케일 아웃이 벌어지는 것을 확인할 수 있다. max=10 
+- 부하를 줄이니 늘어난 스케일이 점점 줄어들었다.
 
+![image](https://user-images.githubusercontent.com/73699193/98102926-92862980-1ed7-11eb-8f19-a673d72da580.png)
+
+- 다시 부하를 주고 확인하니 Availability가 높아진 것을 확인 할 수 있었다.
+
+![image](https://user-images.githubusercontent.com/73699193/98103249-14765280-1ed8-11eb-8c7c-9ea1c67e03cf.png)
 
 
 ## 무정지 재배포
 
+* 먼저 무정지 재배포가 100% 되는 것인지 확인하기 위해서 Autoscale 이나 CB 설정을 제거함
+
+
+- seige 로 배포작업 직전에 워크로드를 모니터링 함.
+```
+kubectl apply -f kubernetes/deployment_readiness.yml
+```
+- readiness 옵션이 없는 경우 배포 중 서비스 요청처리 실패
+
+![image](https://user-images.githubusercontent.com/73699193/98105334-2a394700-1edb-11eb-9633-f5c33c5dee9f.png)
+
+
 - deployment.yml에 readiness 옵션을 추가 
 
+![image](https://user-images.githubusercontent.com/73699193/98107176-75ecf000-1edd-11eb-88df-617c870b49fb.png)
 
-![무정지 배포1](https://user-images.githubusercontent.com/78134019/109809110-45d71300-7c6b-11eb-955c-9b8a3b3db698.png)
+- readiness적용된 deployment.yml 적용
 
-
-- seige 실행
 ```
-siege -c100 -t120S -r10 -v --content-type "application/json" 'http://20.194.36.201:8080/taxicalls POST {"tel": "0101231234"}'
+kubectl apply -f kubernetes/deployment.yml
 ```
+- 새로운 버전의 이미지로 교체
+```
+cd acr
+az acr build --registry admin02 --image admin02.azurecr.io/store:v4 .
+kubectl set image deploy store store=admin02.azurecr.io/store:v4 -n phone82
+```
+- 기존 버전과 새 버전의 store pod 공존 중
 
+![image](https://user-images.githubusercontent.com/73699193/98106161-65884580-1edc-11eb-9540-17a3c9bdebf3.png)
 
 - Availability: 100.00 % 확인
 
-
-![무정지 배포2](https://user-images.githubusercontent.com/78134019/109810318-bd597200-7c6c-11eb-88e4-197386b1e338.png)
-
-
-![무정지 배포3](https://user-images.githubusercontent.com/78134019/109810688-2fca5200-7c6d-11eb-9c67-d252d703064a.png)
+![image](https://user-images.githubusercontent.com/73699193/98106524-c152ce80-1edc-11eb-8e0f-3731ca2f709d.png)
 
 
 
@@ -727,60 +645,74 @@ siege -c100 -t120S -r10 -v --content-type "application/json" 'http://20.194.36.2
 
 * default쪽
 
-![configmap1](https://user-images.githubusercontent.com/31096538/109798636-5df46580-7c5e-11eb-982d-16482f98b13f.JPG)
+![image](https://user-images.githubusercontent.com/73699193/98108335-1c85c080-1edf-11eb-9d0f-1f69e592bb1d.png)
 
 * docker 쪽
 
-![configmap2](https://user-images.githubusercontent.com/31096538/109798699-6e0c4500-7c5e-11eb-9d0d-47b90d637ae9.JPG)
+![image](https://user-images.githubusercontent.com/73699193/98108645-ad5c9c00-1edf-11eb-8d54-487d2262e8af.png)
 
 - Deployment.yml 설정
 
-![configmap3](https://user-images.githubusercontent.com/31096538/109798713-72d0f900-7c5e-11eb-8458-8fb9d6225c49.JPG)
+![image](https://user-images.githubusercontent.com/73699193/98108902-12b08d00-1ee0-11eb-8f8a-3a3ea82a635c.png)
 
 - config map 생성 후 조회
 ```
-kubectl create configmap apiurl --from-literal=url=http://taxicall:8080 --from-literal=fluentd-server-ip=10.xxx.xxx.xxx -n team03
+kubectl create configmap apiurl --from-literal=url=http://pay:8080 --from-literal=fluentd-server-ip=10.xxx.xxx.xxx -n phone82
 ```
-![configmap4](https://user-images.githubusercontent.com/31096538/109798727-76fd1680-7c5e-11eb-9818-327870ea2e4d.JPG)
+![image](https://user-images.githubusercontent.com/73699193/98107784-5bffdd00-1ede-11eb-8da6-82dbead0d64f.png)
 
 - 설정한 url로 주문 호출
 ```
-http 20.194.36.201:8080/taxicalls tel="01012345678" status="call" location="mapo" cost=25000
+http POST http://app:8080/orders item=dfdf1 qty=21
 ```
 
-![configmap5](https://user-images.githubusercontent.com/31096538/109798744-7c5a6100-7c5e-11eb-8aaa-03fa8277cee6.JPG)
+![image](https://user-images.githubusercontent.com/73699193/98109319-b732cf00-1ee0-11eb-9e92-ad0e26e398ec.png)
 
 - configmap 삭제 후 app 서비스 재시작
 ```
-kubectl delete configmap apiurl -n team03
-kubectl get pod/taxicall-74f7dbc967-mtbmq -n team03 -o yaml | kubectl replace --force -f-
+kubectl delete configmap apiurl -n phone82
+kubectl get pod/app-56f677d458-5gqf2 -n phone82 -o yaml | kubectl replace --force -f-
 ```
-![configmap6](https://user-images.githubusercontent.com/31096538/109798766-811f1500-7c5e-11eb-8008-1b9073cb6722.JPG)
+![image](https://user-images.githubusercontent.com/73699193/98110005-cf571e00-1ee1-11eb-973f-2f4922f8833c.png)
 
 - configmap 삭제된 상태에서 주문 호출   
 ```
-http 20.194.36.201:8080/taxicalls tel="01012345678" status="call" location="mapo" cost=25000
-kubectl get all -n team03
+http POST http://app:8080/orders item=dfdf2 qty=22
 ```
-![configmap7](https://user-images.githubusercontent.com/31096538/109798785-85e3c900-7c5e-11eb-8769-ab416b1e17b2.JPG)
+![image](https://user-images.githubusercontent.com/73699193/98110323-42f92b00-1ee2-11eb-90f3-fe8044085e9d.png)
 
+![image](https://user-images.githubusercontent.com/73699193/98110445-720f9c80-1ee2-11eb-851e-adcd1f2f7851.png)
 
-![configmap8](https://user-images.githubusercontent.com/31096538/109798805-8bd9aa00-7c5e-11eb-8d05-1db2457d3611.JPG)
+![image](https://user-images.githubusercontent.com/73699193/98110782-f4985c00-1ee2-11eb-97a7-1fed3c6b042c.png)
 
-
-![configmap9](https://user-images.githubusercontent.com/31096538/109798824-9005c780-7c5e-11eb-9d5b-6f14f9b6bba9.JPG)
 
 
 ## Self-healing (Liveness Probe)
 
+- store 서비스 정상 확인
+
+![image](https://user-images.githubusercontent.com/27958588/98096336-fb1cd880-1ece-11eb-9b99-3d704cd55fd2.jpg)
+
 
 - deployment.yml 에 Liveness Probe 옵션 추가
 ```
+cd ~/phone82/store/kubernetes
+vi deployment.yml
+
+(아래 설정 변경)
 livenessProbe:
 	tcpSocket:
 	  port: 8081
 	initialDelaySeconds: 5
 	periodSeconds: 5
 ```
-![selfhealing](https://user-images.githubusercontent.com/78134019/109805068-589b1900-7c66-11eb-9565-d44adde4ffc5.jpg)
+![image](https://user-images.githubusercontent.com/27958588/98096375-0839c780-1ecf-11eb-85fb-00e8252aa84a.jpg)
+
+- store pod에 liveness가 적용된 부분 확인
+
+![image](https://user-images.githubusercontent.com/27958588/98096393-0a9c2180-1ecf-11eb-8ac5-f6048160961d.jpg)
+
+- store 서비스의 liveness가 발동되어 13번 retry 시도 한 부분 확인
+
+![image](https://user-images.githubusercontent.com/27958588/98096461-20a9e200-1ecf-11eb-8b02-364162baa355.jpg)
 
