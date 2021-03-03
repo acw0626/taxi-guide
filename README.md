@@ -717,7 +717,7 @@ hystrix:
 부하테스트
 
 
-* Siege Run
+* Siege 리소스 생성
 
 ```
 kubectl run siege --image=apexacme/siege-nginx -n team03
@@ -735,7 +735,8 @@ kubectl exec -it pod/siege-5459b87f86-hlfm9 -c siege -n team03 -- /bin/bash
 siege -c200 -t60S -r10 -v --content-type "application/json" 'http://20.194.36.201:8080/taxicalls POST {"tel": "0101231234"}'
 ```
 
-- 부하 발생하여 CB가 발동하여 요청 실패처리하였고, 밀린 부하가 pay에서 처리되면서 다시 taxicall 받기 시작 
+- 부하 발생하여 CB가 발동하여 요청 실패처리하였고, 밀린 부하가 택시호출(taxicall) 서비스에서 처리되면서 
+다시 taxicall에서 서비스를 받기 시작 합니다
 
 ![secs1](https://user-images.githubusercontent.com/78134019/109786899-01d71480-7c51-11eb-9e6c-0a819e85b020.png)
 
@@ -810,11 +811,11 @@ siege -c100 -t120S -r10 -v --content-type "application/json" 'http://20.194.36.2
 
 - apllication.yml 설정
 
-* default쪽
+* default 프로파일
 
 ![configmap1](https://user-images.githubusercontent.com/31096538/109798636-5df46580-7c5e-11eb-982d-16482f98b13f.JPG)
 
-* docker 쪽
+* docker 프로파일
 
 ![configmap2](https://user-images.githubusercontent.com/31096538/109798699-6e0c4500-7c5e-11eb-9d0d-47b90d637ae9.JPG)
 
