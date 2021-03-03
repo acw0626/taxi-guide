@@ -16,7 +16,7 @@ for message in consumer:
 #	msg = message.value.decode('utf-8')
 #	print( '' )
 
-sys.exit()
+#sys.exit()
 
 
 

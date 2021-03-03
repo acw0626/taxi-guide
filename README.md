@@ -204,11 +204,37 @@ pause ..
 
 
 ## 폴리글랏 프로그래밍 - 파이썬
+
+- 로컬 용 소스 
 ```
-위치 : /taxiguider_py>cutomer>policy-handler.py
+위치 : /taxiguider_py>cutomer>policy-handler-local.py
 ```
 ![폴리그랏프로그래밍](https://user-images.githubusercontent.com/78134019/109745241-ebac6280-7c16-11eb-8839-6c974340839b.jpg)
 
+- 클라우드 용 소스 
+```
+위치 : /taxiguider_py>cutomer>policy-handler.py
+
+#-*- coding: euc-kr -*-
+
+from flask import Flask
+from redis import Redis, RedisError
+from kafka import KafkaConsumer
+import os
+import socket
+
+
+# To consume latest messages and auto-commit offsets
+consumer = KafkaConsumer('taxiguider',
+                         group_id='customer',
+                         bootstrap_servers=['my-kafka.kafka.svc.cluster.local:9092'])
+for message in consumer:
+  print ("%s:%d:%d: key=%s value=%s" % (message.topic, message.partition, message.offset, message.key, message.value.decode('utf-8')))
+#	msg = message.value.decode('utf-8')
+#	print( '' )
+
+#sys.exit()
+```
 
 ## 마이크로 서비스 호출 흐름
 
