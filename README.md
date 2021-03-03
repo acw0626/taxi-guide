@@ -359,6 +359,8 @@ public interface TaximanageService {
 
 ```
 
+다음은 택시관리Service 인터페이스를 구현한 택시관리ServiceFallback 클래스이며, 클라우드 배포용 영문과 따로 구현 되었습니다.
+
 ```
 # external > 택시관리ServiceFallback.java
 
@@ -382,6 +384,8 @@ public class 택시관리ServiceFallback implements 택시관리Service {
 ```
 
 ![동기식](https://user-images.githubusercontent.com/78134019/109463569-97837000-7aa8-11eb-83c4-6f6eff1594aa.jpg)
+
+
 ![2021-03-04_004922](https://user-images.githubusercontent.com/7607807/109832226-80e54080-7c83-11eb-9526-e1820a60c938.png)
 
 
@@ -418,7 +422,7 @@ public class 택시관리ServiceFallback implements 택시관리Service {
 		}
 ```
 
-- 클라우드 배포시 영문 택시 할당요청
+- 클라우드 배포시 택시 할당요청(영문)
 
 택시호출을 하면 택시관리에 택시 할당 요청을 다음과 같이 동기적으로 진행 합니다.
 ```
@@ -455,12 +459,14 @@ public void onPostPersist(){
 ```
 
 ![동기식2](https://user-images.githubusercontent.com/78134019/109463985-47f17400-7aa9-11eb-8603-c1f83e17951d.jpg)
+
+
 ![2021-03-04_005205](https://user-images.githubusercontent.com/7607807/109832649-e6393180-7c83-11eb-822f-bd41957e7a65.png)
 
-- 동기식 호출 적용으로 택시 관리 시스템이 정상적이지 않으면 , 택시콜도 접수될 수 없음을 확인 
-```
-# 택시 관리 시스템 down 후 taxicall 호출 
+- 동기식 호출 적용으로 택시 관리 시스템이 정상적이지 않으면 , 택시콜도 접수될 수 없음을 다음과 같이 확인 할 수 있습니다.
 
+```
+- 택시 관리 시스템 down 후 taxicall 호출 
 #taxicall
 
 C:\Users\Administrator>http localhost:8081/택시호출s 휴대폰번호="01012345678" 호출상태="호출"
@@ -468,9 +474,10 @@ C:\Users\Administrator>http localhost:8081/택시호출s 휴대폰번호="010123
 
 ![택시관리죽으면택시콜놉](https://user-images.githubusercontent.com/78134019/109464780-905d6180-7aaa-11eb-9c90-e7d1326deea1.jpg)
 
-# 택시 관리 (taximanage) 재기동 후 주문하기
+
 ```
-#주문하기(order)
+# 택시 관리 (taximanage) 재기동 후 호출
+
 http localhost:8081/택시호출s 휴대폰번호="01012345678" 호출상태="호출"
 ```
 
@@ -483,10 +490,12 @@ http localhost:8081/택시호출s 휴대폰번호="01012345678" 호출상태="�
 
 ## 비동기식 호출 / 장애격리  / 성능
 
-택시 관리 (Taxi manage) 이후 택시 할당(Taxi Assign) 은 비동기식 처리이므로 , 택시 호출(Taxi call) 의 서비스 호출에는 영향이 없다
+택시 관리 (Taxi manage) 이후 택시 할당(Taxi Assign) 은 비동기식 처리이므로 , 
+택시 호출(Taxi call) 의 서비스 호출에는 영향이 없도록 구성 합니다.
  
-고객이 택시 호출(Taxi call) 후 상태가 [호출]->[호출중] 로 변경되고 할당이 완료되면 [호출확정] 로 변경이 되지만 , 택시 할당(Taxi Assign)이 정상적이지 않으므로 [호출중]로 남아있음. 
---> (시간적 디커플링)
+고객이 택시 호출(Taxicall) 후 상태가 [호출]->[호출중] 로 변경되고 할당이 완료되면 [호출확정] 로 변경이 되지만 , 
+택시 할당(TaxiAssign)이 정상적이지 않으므로 [호출중]로 남게 됩니다. 
+
 <고객 택시 호출 Taxi call>
 ![비동기_호출2](https://user-images.githubusercontent.com/78134019/109468467-f4365900-7aaf-11eb-877a-049637b5ee6a.png)
 
@@ -495,15 +504,31 @@ http localhost:8081/택시호출s 휴대폰번호="01012345678" 호출상태="�
 
 
 
-## 성능 조회 / View 조회
-고객이 호출한 모든 정보는 조회가 가능하다. 
+## 정보 조회 / View 조회
+고객은 택시가 할당되는 동안의 내용을 조회 할 수 있습니다.
 
 ![고객View](https://user-images.githubusercontent.com/78134019/109483385-80ea1280-7ac2-11eb-9419-bf3ff5a0dbbc.png)
 
 
----mvn MSA Service
+## 소스 패키징
+
+- 클라우드 배포를 위해서 다음과 같이 패키징 작업을 하였습니다.
+```
+cd gateway
+mvn clean && mvn package
+cd ..
+cd taxicall
+mvn clean && mvn package
+cd ..
+cd taximanage
+mvn clean && mvn package
+cd ..
+cd taxiassign
+mvn clean && mvn package
+cd ..
+```
+
 <gateway>
-	
 ![mvn_gateway](https://user-images.githubusercontent.com/78134019/109744124-244b3c80-7c15-11eb-80a9-bed42413aa58.png)
 	
 <taxicall>
@@ -519,11 +544,18 @@ http localhost:8081/택시호출s 휴대폰번호="01012345678" 호출상태="�
 ![mvn_taxiassign](https://user-images.githubusercontent.com/78134019/109744226-46dd5580-7c15-11eb-8b47-5100ed01e3ae.png)
 
 
-# 운영
+# 클라우드 배포/운영 파이프라인
 
-## Deploy / Pipeline
+- 애저 클라우드에 배포하기 위해서 다음과 같이 주요 정보를 설정 하였습니다.
+
+```
+리소스 그룹명 : skccteam03-rsrcgrp
+클러스터 명 : skccteam03-aks
+레지스트리 명 : skccteam03
+```
 
 - az login
+우선 애저에 로그인 합니다.
 ```
 {
     "cloudName": "AzureCloud",
@@ -541,24 +573,6 @@ http localhost:8081/택시호출s 휴대폰번호="01012345678" 호출상태="�
   }
 ```
 
-
-- account set 
-```
-az account set --subscription "종량제2"
-```
-
-
-- 리소스그룹생성
-```
-그룹명 : skccteam03-rsrcgrp
-```
-
-
-- 클러스터 생성
-```
-클러스터 명 : skccteam03-aks
-```
-
 - 토큰 가져오기
 ```
 az aks get-credentials --resource-group skccteam03-rsrcgrp --name skccteam03-aks
@@ -571,7 +585,7 @@ az aks update -n skccteam03-aks -g skccteam03-rsrcgrp --attach-acr skccteam03
 
 ![aks붙이기](https://user-images.githubusercontent.com/78134019/109653395-540e2c00-7ba4-11eb-97dd-2dcfdf5dc539.jpg)
 
-네임스페이스 만들기
+- 네임스페이스 만들기
 
 ```
 kubectl create ns team03
@@ -579,33 +593,23 @@ kubectl get ns
 ```
 ![image](https://user-images.githubusercontent.com/78134019/109776836-5cb73e80-7c46-11eb-9562-d462525d6dab.png)
 
-
-
-
-
-* 도커 이미지 만들어서 올리기
+* 도커 이미지 만들고 레지스트리에 등록하기
 ```
-cd gateway
-az acr build --registry skccteam03 --image skccteam03.azurecr.io/gateway:v1 .
-az acr build --registry skccteam03 --image skccteam03.azurecr.io/gateway:v2 .
+cd taxicall_eng
+az acr build --registry skccteam03 --image skccteam03.azurecr.io/taxicalleng:v1 .
+az acr build --registry skccteam03 --image skccteam03.azurecr.io/taxicalleng:v2 .
 cd ..
-cd taxicall
-az acr build --registry skccteam03 --image skccteam03.azurecr.io/taxicall:v1 .
+cd taximanage_eng
+az acr build --registry skccteam03 --image skccteam03.azurecr.io/taximanageeng:v1 .
 cd ..
-cd taximanage
-az acr build --registry skccteam03 --image skccteam03.azurecr.io/taximanage:v1 .
+cd taxiassign_eng
+az acr build --registry skccteam03 --image skccteam03.azurecr.io/taxiassigneng:v1 .
 cd ..
-cd taxiassign
-az acr build --registry skccteam03 --image skccteam03.azurecr.io/taxiassign:v1 .
+cd gateway_eng
+az acr build --registry skccteam03 --image skccteam03.azurecr.io/gatewayeng:v1 .
 cd ..
-
 cd customer_py
 az acr build --registry skccteam03 --image skccteam03.azurecr.io/customer-policy-handler:v1 .
-
-az acr build --registry skccteam03 --image skccteam03.azurecr.io/customer-policy-handler:v2 .
-
-
-az acr build --registry [acr-registry-name] --image [acr-registry-name].azurecr.io/products:v1 .
 ```
 
 ![docker_gateway](https://user-images.githubusercontent.com/78134019/109777813-76a55100-7c47-11eb-8d8d-59eaabefab54.png)
@@ -619,18 +623,36 @@ az acr build --registry [acr-registry-name] --image [acr-registry-name].azurecr.
 ![docker_customer](https://user-images.githubusercontent.com/78134019/109777829-7907ab00-7c47-11eb-936f-723396cb272a.png)
 
 
-
-
-
--deployment.yml을 사용하여 배포 
+-각 마이크로 서비스를 yml 파일을 사용하여 배포 합니다.
 
 
 ![deployment_yml](https://user-images.githubusercontent.com/78134019/109652001-9171ba00-7ba2-11eb-8c29-7128ceb4ec97.jpg)
 
 - deployment.yml로 서비스 배포
 ```
-cd app
-kubectl apply -f kubernetes/deployment.yml
+cd ../../
+cd customer_py/kubernetes
+kubectl apply -f deployment.yml --namespace=team03
+kubectl apply -f service.yaml --namespace=team03
+cd ../../
+cd taxicall_eng/kubernetes
+kubectl apply -f deployment.yml --namespace=team03
+kubectl apply -f service.yaml --namespace=team03
+
+cd ../../
+cd taximanage_eng/kubernetes
+kubectl apply -f deployment.yml --namespace=team03
+kubectl apply -f service.yaml --namespace=team03
+
+cd ../../
+cd taxiassign_eng/kubernetes
+kubectl apply -f deployment.yml --namespace=team03
+kubectl apply -f service.yaml --namespace=team03
+
+cd ../../
+cd gateway_eng/kubernetes
+kubectl apply -f deployment.yml --namespace=team03
+kubectl apply -f service.yaml --namespace=team03
 ```
 <Deploy cutomer>
 	
@@ -649,12 +671,11 @@ kubectl apply -f kubernetes/deployment.yml
 ![deploy_taxicall](https://user-images.githubusercontent.com/78134019/109744487-bb17f900-7c15-11eb-8bd0-ff0a9fc9b2e3.png)
 
 
-
 ![deploy_taximanage](https://user-images.githubusercontent.com/78134019/109744591-e69ae380-7c15-11eb-834a-44befae55092.png)
 
 
 
-서비스확인
+- 서비스확인
 ```
 kubectl get all -n team03
 ```
@@ -664,9 +685,11 @@ kubectl get all -n team03
 
 ## 동기식 호출 / 서킷 브레이킹 / 장애격리
 
-* 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현함
+* 서킷 브레이킹 프레임워크의 선택: Spring FeignClient + Hystrix 옵션을 사용하여 구현하였습니다.
 
-- Hystrix 를 설정:  요청처리 쓰레드에서 처리시간이 610 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
+- Hystrix 를 설정:  
+
+요청처리 쓰레드에서 처리시간이 610 밀리가 넘어서기 시작하여 어느정도 유지되면 CB 회로가 닫히도록 (요청을 빠르게 실패처리, 차단) 설정
 ```
 # application.yml
 feign:
@@ -751,7 +774,7 @@ root@siege-5459b87f86-hlfm9:/# siege -c100 -t120S -r10 -v --content-type "applic
 
 
 
-- 오토스케일이 어떻게 되고 있는지 모니터링을 걸어둔다:
+- 오토스케일링에 대한 모니터링:
 ```
 kubectl get deploy taxicall -w -n team03
 ```
