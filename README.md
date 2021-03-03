@@ -217,7 +217,7 @@ pause ..
 호출(taxicall)->택시관리(taximanage) 우선 호출처리(req/res) 되며,
 택시할당(taxiassign)에서 택시기사를 할당하게 되면 호출 상태가 호출에서 호출확정 상태가 됩니다
 
-우선, 다음과 같이 두 개의 호출 상태를 만듭니다.
+우선, 로컬에서는 다음과 같이 두 개의 호출 상태를 만듭니다.
 ```
 http localhost:8081/택시호출s 휴대폰번호="01012345678" 호출상태=호출 호출위치="마포" 예상요금=25000
 http localhost:8081/택시호출s 휴대폰번호="01056789012" 호출상태=호출 호출위치="서대문구" 예상요금=30000
@@ -226,6 +226,13 @@ http localhost:8081/택시호출s 휴대폰번호="01056789012" 호출상태=호
 
 ![taxicall2](https://user-images.githubusercontent.com/78134019/109771589-545c0500-7c40-11eb-997a-90249ea8f912.png)
 
+우선, 클라우드 상에서 호출은 다음과 같이 합니다. External-IP는 20.194.36.201 입니다.
+```
+http 20.194.36.201:8080/taxicalls tel="01023456789" status="호출" cost=25500
+http 20.194.36.201:8080/taxicalls tel="01023456789" status="호출" cost=25500
+```
+
+![1](https://user-images.githubusercontent.com/7607807/109840083-16380300-7c8b-11eb-80d1-5eb6815ac53a.png)
 
 
 아래 호출 결과는 모두 택시 할당(taxiassign)에서 택시기사의 할당되어 호출 서비스를 확인하연 호출 상태는 호출 확정가 되어 있습니다.
@@ -236,7 +243,9 @@ http localhost:8081/택시호출s 휴대폰번호="01056789012" 호출상태=호
 
 ![5](https://user-images.githubusercontent.com/78134019/109771661-6c338900-7c40-11eb-8a4a-9a758a8d1613.png)
 
+클라우드 상에서도 마찬가지 입니다.
 
+![3](https://user-images.githubusercontent.com/7607807/109840275-50090980-7c8b-11eb-9f37-0ca07115308e.png)
 
 - taxicall 서비스 호출 취소 처리
 
@@ -247,23 +256,36 @@ http delete http://localhost:8081/택시호출s/1
 HTTP/1.1 204
 Date: Tue, 02 Mar 2021 16:59:12 GMT
 ```
+
+클라우드 상에서 호출 취소는 다음과 같습니다.
+```
+http delete http://20.194.36.201:8080/taxicalls/1
+HTTP/1.1 204
+Date: Tue, 02 Mar 2021 16:59:12 GMT
+```
+
+
 호출이 취소 되면 아래와 같이 택시 호출이 하나가 삭제 되었고, 
 
 ```
 http localhost:8081/택시호출s/
+http 20.194.36.201:8080/taxicalls
 ```
 
 ![6](https://user-images.githubusercontent.com/78134019/109771698-7a81a500-7c40-11eb-964e-a07e989f997c.png)
 
+![1](https://user-images.githubusercontent.com/7607807/109840796-cb6abb00-7c8b-11eb-8cb9-0d623fe11043.png)
 
 택시관리에서는 해당 호출의 호출 상태가 호출취소로 상태가 변경 됩니다.
 
 ```
 http localhost:8082/택시관리s/
+http 20.194.36.201:8080/taximanags
 ```
 
 ![7](https://user-images.githubusercontent.com/78134019/109771726-83727680-7c40-11eb-88bd-169a8d6184fe.png)
 
+![2](https://user-images.githubusercontent.com/7607807/109840982-f3f2b500-7c8b-11eb-9373-00844726bb04.png)
 
 - 고객 메시지 서비스 처리 
 
