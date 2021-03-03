@@ -247,6 +247,7 @@ http 20.194.36.201:8080/taxicalls tel="01023456789" status="호출" cost=25500
 
 ![3](https://user-images.githubusercontent.com/7607807/109840275-50090980-7c8b-11eb-9f37-0ca07115308e.png)
 
+![1](https://user-images.githubusercontent.com/7607807/109841386-564bb580-7c8c-11eb-8262-bf28c1a2bd70.png)
 - taxicall 서비스 호출 취소 처리
 
 호출 취소는 택시호출에서 다음과 같이 호출 하나를 취소 함으로써 진행 합니다.
