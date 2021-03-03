@@ -1,0 +1,15 @@
+taxiguider\AbstractEvent$1.class
+taxiguider\external\TaximanageService.class
+taxiguider\external\TaximanageServiceFallback.class
+taxiguider\AbstractEvent.class
+taxiguider\TaxicallApplication.class
+taxiguider\Taxicall.class
+taxiguider\TaxicallRepository.class
+taxiguider\TaxicallCancelled.class
+taxiguider\TaxicallController.class
+taxiguider\TaxiassignCancelled.class
+taxiguider\TaxiassignCompleted.class
+taxiguider\TaxicallPolicyHandler.class
+taxiguider\config\kafka\KafkaProcessor.class
+taxiguider\external\Taximanage.class
+taxiguider\Taxicalled.class

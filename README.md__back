@@ -343,6 +343,28 @@ http localhost:8081/orders/1
 
 ```
 
+```
+# taxicall 서비스 호출처리(영문)
+http localhost:8081/taxicalls tel="01012345678" status="호출"
+http localhost:8081/taxicalls tel="01012345678" status="호출" location="마포" cost=25000
+
+
+http http://localhost:8081/taxicalls/1
+
+http localhost:8081/taxicalls/
+
+http delete http://localhost:8081/taxicalls/1
+
+http localhost:8081/taxicalls/
+http localhost:8082/taximanages/
+
+# taximanage 서비스 처리
+http://localhost:8082/택시관리s/1
+
+# taxiassign 확인
+http localhost:8081/orders/1
+
+```
 
 ## 폴리글랏 퍼시스턴스
 

@@ -146,8 +146,7 @@ Eventual Consistency 를 기본으로 채택함.
 
 ## 헥사고날 아키텍처 다이어그램 도출 (Polyglot)
 
-![핵사고날수정됨](https://user-images.githubusercontent.com/78134019/109488099-7468b880-7ac8-11eb-93ec-b68003e5ccf4.jpg)
-
+![핵사고날수정됨](screenshots/hexagonal_archi.png "헥사고날아키텍처")
 
 
 
@@ -222,8 +221,68 @@ SET PATH=%MARIA_HOME%\BIN;%MONGO_HOME%\BIN;%KAFKA_HOME%\BIN\WINDOWS;%JAVA_HOME%\
 
 ![폴리그랏프로그래밍](https://user-images.githubusercontent.com/78134019/109489189-dbd33800-7ac9-11eb-86f5-bbdb072454ce.jpg)
 
+## 마이크로 서비스 호출 흐름
+
+- taxicall 서비스 호출처리
+호출(taxicall)->택시관리(taximanage) 간의 호출처리 됨.
+택시 할당에서 택시기사를 할당하여 호출 확정 상태가 됨.
+두 개의 호출 상태
+를 만듬.
+```
+http localhost:8081/택시호출s 휴대폰번호="01012345678" 호출상태=호출 호출위치="마포" 예상요금=25000
+http localhost:8081/택시호출s 휴대폰번호="01056789012" 호출상태=호출 호출위치="서대문구" 예상요금=30000
+```
+
+![image](screenshots/taxicall1.png "taxicall 서비스 호출")
+![image](screenshots/taxicall2.png "taxicall 서비스 호출")
+
+호출 결과는 모두 택시 할당(taxiassign)에서 택시기사의 할당으로 처리되어 호출 확정 상태가 되어 있음.
+
+![image](screenshots/taxicall_result1.png "taxicall 서비스 호출 결과")
+![image](screenshots/taxicall_result2.png "taxicall 서비스 호출 결과")
+![image](screenshots/taximanage_result1.png "taxicall 서비스 호출 결과 - 택시관리")
+
+
+- taxicall 서비스 호출 취소 처리
+
+호출 취소는 택시호출에서 다음과 같이 호출 하나를 취소 함으로써 진행 함.
+
+```
+http delete http://localhost:8081/택시호출s/1
+HTTP/1.1 204
+Date: Tue, 02 Mar 2021 16:59:12 GMT
+```
+호출이 취소 되면 택시 호출이 하나가 삭제 되었고, 
+
+```
+http localhost:8081/택시호출s/
+```
+![image](screenshots/taxicancel_result.png "taxicall 서비스 호출취소 결과")
+
+
+택시관리에서는 해당 호출에 대해서 호출취소로 상태가 변경 됨.
+
+```
+http localhost:8082/택시관리s/
+```
+![image](screenshots/taximanage_result.png "taxicall 서비스 호출취소 결과")
+
+- 고객 메시지 서비스 처리
+고객(customer)는 호출 확정과 할당 확정에 대한 메시지를 다음과 같이 받을 수 있으며,
+할당 된 택시기사의 정보를 또한 확인 할 수 있다.
+파이썬으로 구현 하였음.
+
+![image](screenshots/customer.png "호출 결과에 대한 고객 메시지")
+
 
 ## Gateway 적용
+
+서비스에 대한 하나의 접점을 만들기 위한 게이트웨이의 설정은 8088로 설정 하였으며, 다음 마이크로서비스에 대한 설정 입니다.
+```
+택시호출 서비스 : 8081
+택시관리 서비스 : 8082
+택시호출 서비스 : 8083
+```
 
 gateway > applitcation.yml 설정
 
