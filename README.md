@@ -576,9 +576,6 @@ cd taxiassign
 mvn clean && mvn package
 cd ..
 ```
-
-<gateway>
-![mvn_gateway](https://user-images.githubusercontent.com/78134019/109744124-244b3c80-7c15-11eb-80a9-bed42413aa58.png)
 	
 <taxicall>
 	
